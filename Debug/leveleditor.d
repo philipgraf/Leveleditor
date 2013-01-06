@@ -1,0 +1,1 @@
+leveleditor.d: ../leveleditor.cpp
