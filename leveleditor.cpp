@@ -62,6 +62,8 @@ int main(int argc, char *argv[]) {
 	SDL_FreeSurface(tmp);
 	tmp = IMG_Load("img/player.png");
 	SDL_Surface *player = SDL_DisplayFormatAlpha(tmp);
+	int playerX = 0;
+	int playerY = 0;
 
 	SDL_Event event;
 
@@ -105,7 +107,8 @@ int main(int argc, char *argv[]) {
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				if (startposition) {
-					tilelist[1][mouseX / TILESIZE][mouseY / TILESIZE] = 65536;
+					playerX = mouseX / TILESIZE;
+					playerY = mouseY / TILESIZE;
 					startposition = false;
 				} else {
 					tilelist[currentLayer][mouseX / TILESIZE][mouseY / TILESIZE] =
@@ -123,37 +126,32 @@ int main(int argc, char *argv[]) {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < mapWidth; j++) {
 				for (int k = 0; k < mapHeight; k++) {
-					if (tilelist[i][j][k] >> 16) {
-						switch (tilelist[i][j][k] >> 16) {
-						case 1:
-							SDL_Rect srcRect;
-							srcRect.x = 0;
-							srcRect.y = 0;
-							srcRect.w = TILESIZE;
-							srcRect.h = TILESIZE * 2;
-							SDL_Rect destRect;
-							destRect.x = j * TILESIZE;
-							destRect.y = k * TILESIZE;
-							destRect.w = TILESIZE;
-							destRect.h = TILESIZE * 2;
-							SDL_BlitSurface(player, &srcRect, screen,
-									&destRect);
-							break;
-						}
-					} else {
-						SDL_Rect srcRect;
-						srcRect.x = 0;
-						srcRect.y = TILESIZE * (tilelist[i][j][k] & 0xFFFFFFFF);
-						srcRect.w = srcRect.h = TILESIZE;
-						SDL_Rect destRect;
-						destRect.x = j * TILESIZE;
-						destRect.y = k * TILESIZE;
-						destRect.w = destRect.h = TILESIZE;
-						SDL_BlitSurface(tileset, &srcRect, screen, &destRect);
-					}
+
+					SDL_Rect srcRect;
+					srcRect.x = 0;
+					srcRect.y = TILESIZE * (tilelist[i][j][k] & 0xFFFFFFFF);
+					srcRect.w = srcRect.h = TILESIZE;
+					SDL_Rect destRect;
+					destRect.x = j * TILESIZE;
+					destRect.y = k * TILESIZE;
+					destRect.w = destRect.h = TILESIZE;
+					SDL_BlitSurface(tileset, &srcRect, screen, &destRect);
+
 				}
 			}
 		}
+
+		SDL_Rect srcRect;
+		srcRect.x = 0;
+		srcRect.y = 0;
+		srcRect.w = TILESIZE;
+		srcRect.h = TILESIZE * 2;
+		SDL_Rect destRect;
+		destRect.x = playerX * TILESIZE;
+		destRect.y = playerY * TILESIZE;
+		destRect.w = TILESIZE;
+		destRect.h = TILESIZE * 2;
+		SDL_BlitSurface(player, &srcRect, screen, &destRect);
 
 		if (startposition) {
 			rectangleRGBA(screen, (mouseX / TILESIZE) * TILESIZE,
@@ -176,6 +174,7 @@ int main(int argc, char *argv[]) {
 
 	}
 
+	tilelist[1][playerY][playerX]=65536;
 	//save file
 	filestream.open((mapname + ".map").c_str(), std::fstream::out);
 
@@ -188,8 +187,6 @@ int main(int argc, char *argv[]) {
 		}
 		filestream << ";" << std::endl;
 	}
-
-
 
 	filestream.close();
 
