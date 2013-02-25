@@ -12,14 +12,16 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_gfxPrimitives.h>
 
+using namespace std;
+
 int main(int argc, char *argv[]) {
 
 	if (argc != 2) {
-		std::cout << "Usage: " << argv[0] << " mapconfigFile" << std::endl;
+		cout << "Usage: " << argv[0] << " mapconfigFile" << endl;
 		return 1;
 	}
 
-	const int MAXTILE = 8;
+	const int MAXTILE =22;
 	const int TILESIZE = 32;
 
 	std::string mapname;
@@ -54,14 +56,18 @@ int main(int argc, char *argv[]) {
 	SDL_Surface *screen = SDL_SetVideoMode(800, 600, 32,
 			SDL_HWSURFACE | SDL_DOUBLEBUF);
 
-	SDL_Surface *tmp = IMG_Load("img/tileset.png");
-	SDL_Surface *tileset = SDL_DisplayFormatAlpha(tmp);
+	SDL_Surface *tmp = SDL_LoadBMP("img/tiles.bmp");
+	SDL_Surface *tileset = SDL_DisplayFormat(tmp);
 	SDL_FreeSurface(tmp);
 	tmp = IMG_Load(("img/" + bgName).c_str());
 	SDL_Surface *bg = SDL_DisplayFormatAlpha(tmp);
 	SDL_FreeSurface(tmp);
-	tmp = IMG_Load("img/player.png");
-	SDL_Surface *player = SDL_DisplayFormatAlpha(tmp);
+	tmp = SDL_LoadBMP("img/player.bmp");
+	SDL_Surface *player = SDL_DisplayFormat(tmp);
+
+	SDL_SetColorKey(player, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(player->format, 255, 0, 255));
+	SDL_SetColorKey(bg, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(bg->format, 255, 0, 255));
+	SDL_SetColorKey(tileset, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tileset->format, 255, 0, 255));
 
 	SDL_Event event;
 
